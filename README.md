@@ -32,3 +32,41 @@ convert between ArrayBuffer, Buffer, Uint8Array
   u83.set([222, 222], 5);
   console.log({ u8, u83 });
 ```
+
+```js
+// @ts-check
+
+/**
+ * @description https://www.isummation.com/blog/convert-arraybuffer-to-base64-string-and-vice-versa/
+ */
+
+
+/** @type {(buffer: ArrayBuffer) => string} */
+function arrayBufferToBase64(buffer) {
+  var binary = '';
+  var bytes = new Uint8Array(buffer);
+  var len = bytes.byteLength;
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/** @type {(base64: string) => ArrayBuffer} */
+function base64ToArrayBuffer(base64) {
+  var binary_string = atob(base64);
+  var len = binary_string.length;
+  var bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) {
+    bytes[i] = binary_string.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+const text = '测试';
+const buffer = (new TextEncoder()).encode(text);
+console.log(buffer);
+const base64text = arrayBufferToBase64(buffer);
+console.log(base64text);
+
+```
