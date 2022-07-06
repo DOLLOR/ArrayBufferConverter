@@ -34,6 +34,78 @@
   console.log({ u8, u83 });
 ```
 
+## Uint8Array vs Base64 vs UnicodeString
+
+```js
+// @ts-check
+'use strict';
+
+// see https://coolaj86.com/articles/typedarray-buffer-to-base64-in-javascript/
+
+
+/** @type {(buf:Uint8Array) => string} */
+function bufferToBase64(buf) {
+  var binstr = Array.prototype.map.call(buf, function (ch) {
+    return String.fromCharCode(ch);
+  }).join('');
+  return btoa(binstr);
+}
+
+/** @type {(base64:string) => Uint8Array} */
+function base64ToBuffer(base64) {
+  var binstr = atob(base64);
+  var buf = new Uint8Array(binstr.length);
+  Array.prototype.forEach.call(binstr, function (ch, i) {
+    buf[i] = ch.charCodeAt(0);
+  });
+  return buf;
+}
+
+// see https://coolaj86.com/articles/unicode-string-to-a-utf-8-typed-array-buffer-in-javascript/
+
+/** 
+ * string to uint array
+ * @type {(s:string) => Uint8Array}
+ */
+function unicodeStringToTypedArray(s) {
+  var escstr = encodeURIComponent(s);
+  var binstr = escstr.replace(/%([0-9A-F]{2})/g, function (match, p1) {
+    return String.fromCharCode('0x' + p1);
+  });
+  var ua = new Uint8Array(binstr.length);
+  Array.prototype.forEach.call(binstr, function (ch, i) {
+    ua[i] = ch.charCodeAt(0);
+  });
+  return ua;
+}
+
+/**
+ * uint array to string
+ * @type {(ua:Uint8Array) => string}
+ */
+function typedArrayToUnicodeString(ua) {
+  /** @type {string} */
+  var binstr = Array.prototype.map.call(ua, function (ch) {
+    return String.fromCharCode(ch);
+  }).join('');
+  var escstr = binstr.replace(/(.)/g, function (m, p) {
+    var code = p.charCodeAt(p).toString(16).toUpperCase();
+    if (code.length < 2) {
+      code = '0' + code;
+    }
+    return '%' + code;
+  });
+  return decodeURIComponent(escstr);
+}
+
+export {
+  base64ToBuffer,
+  bufferToBase64,
+  unicodeStringToTypedArray,
+  typedArrayToUnicodeString
+};
+```
+
 ## ArrayBuffer vs Base64
 
 ```js
