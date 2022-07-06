@@ -1,5 +1,6 @@
 # ArrayBufferConverter
-convert between ArrayBuffer, Buffer, Uint8Array
+
+## convert between ArrayBuffer, Buffer, Uint8Array
 
 ```ts
   // convert without copy
@@ -32,6 +33,8 @@ convert between ArrayBuffer, Buffer, Uint8Array
   u83.set([222, 222], 5);
   console.log({ u8, u83 });
 ```
+
+## ArrayBuffer vs Base64
 
 ```js
 // @ts-check
