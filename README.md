@@ -145,3 +145,53 @@ const base64text = arrayBufferToBase64(buffer);
 console.log(base64text);
 
 ```
+## Uint8Array vs Stream
+```js
+/**
+ * @param {Uint8Array} uint8Array
+ * @returns {ReadableStream<Uint8Array>}
+ */
+function u8aToStream(uint8Array) {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(uint8Array);
+      controller.close();
+    }
+  });
+}
+
+/**
+ * @param {ReadableStream<Uint8Array>} stream
+ */
+async function streamToU8a(stream) {
+  /** @type {Uint8Array[]} */
+  const bufferList = [];
+
+  const reader = stream.getReader();
+  while (true) {
+    const res = await reader.read();
+    if (res.value != null) {
+      bufferList.push(res.value);
+    }
+
+    if (res.done) {
+      break;
+    }
+  }
+
+  const size = bufferList.reduce((pre, cur, index) => {
+    return pre + cur.length;
+  }, 0);
+
+  const u8 = new Uint8Array(size);
+  let writtenLength = 0;
+
+  for (let i = 0; i < bufferList.length; i++) {
+    const item = bufferList[i];
+    u8.set(item, writtenLength);
+    writtenLength += item.byteLength;
+  }
+
+  return u8;
+}
+```
